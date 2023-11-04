@@ -6,7 +6,19 @@ using MathNet.Numerics.LinearAlgebra;
 using System;
 using Fractions;
 using MathNet.Numerics;
+using System.Globalization;
+using System.Reflection;
 using System.Text.RegularExpressions;
+using MathNet.Numerics.LinearAlgebra.Solvers;
+using MathNet.Numerics.LinearAlgebra.Factorization;
+using MathNet.Numerics.LinearAlgebra.Double;
+using MathNet.Numerics.LinearAlgebra.Double.Solvers;
+using MathNet.Symbolics;
+using MathNet.Numerics.RootFinding;
+using static Microsoft.FSharp.Core.ByRefKinds;
+using NCalc;
+using System.Diagnostics;
+using MathNet.Numerics.Interpolation;
 
 namespace Matricav2
 {
@@ -50,6 +62,8 @@ namespace Matricav2
             var metodailist = new List<metodai>();
             var Gausolist = new List<Gauso>();
             var iteraciniailist = new List<Gauso>();
+            var netiesiniailist = new List<Gauso>();
+            var interpoliavimaslist = new List<Gauso>();
             if (tikrinimas == 0)
             {
 
@@ -57,10 +71,12 @@ namespace Matricav2
                 metodailist.Add(new metodai { tekstas = "Gauso Metodas", pasirinkimas = 1 });
                 metodailist.Add(new metodai { tekstas = "Pagrindinio elemento Metodas", pasirinkimas = 2 });
                 metodailist.Add(new metodai { tekstas = "iteraciniai sprendimo metodai", pasirinkimas = 3 });
+                metodailist.Add(new metodai { tekstas = "Netiesiniø lygèiø metodai", pasirinkimas = 4 });
+                metodailist.Add(new metodai { tekstas = "Interpoliavimas", pasirinkimas = 5 });
                 Method.DataSource = metodailist;
                 Method.DisplayMember = "tekstas";
                 Method.ValueMember = "pasirinkimas";
-                
+
                 Goal.Enabled = false;
             }
             else
@@ -79,7 +95,7 @@ namespace Matricav2
                         Goal.SelectedIndex = 0;
                         break;
                     case 2:
-                        
+
                         Goal.Enabled = false;
                         break;
                     case 3:
@@ -92,18 +108,38 @@ namespace Matricav2
                         Goal.Enabled = true;
                         Goal.SelectedIndex = 0;
                         break;
-
+                    case 4:
+                        netiesiniailist.Add(new Gauso { tekstas = "Pasirinkti", pasirinkimas = 0 });
+                        netiesiniailist.Add(new Gauso { tekstas = "Bandymu metodas", pasirinkimas = 1 });
+                        netiesiniailist.Add(new Gauso { tekstas = "Kirstiniu metodas", pasirinkimas = 2 });
+                        netiesiniailist.Add(new Gauso { tekstas = "Niutono  metodas", pasirinkimas = 3 });
+                        Goal.DataSource = netiesiniailist;
+                        Goal.DisplayMember = "tekstas";
+                        Goal.ValueMember = "pasirinkimas";
+                        Goal.Enabled = true;
+                        Goal.SelectedIndex = 0;
+                        break;
+                    case 5:
+                        interpoliavimaslist.Add(new Gauso { tekstas = "Pasirinkti", pasirinkimas = 0 });
+                        interpoliavimaslist.Add(new Gauso { tekstas = "Tiesinis", pasirinkimas = 1 });
+                        interpoliavimaslist.Add(new Gauso { tekstas = "Kvadratinis", pasirinkimas = 2 });
+                        Goal.DataSource = interpoliavimaslist;
+                        Goal.DisplayMember = "tekstas";
+                        Goal.ValueMember = "pasirinkimas";
+                        Goal.Enabled = true;
+                        Goal.SelectedIndex = 0;
+                        break;
                     default:
                         Goal.Enabled = false;
-                        
+
                         break;
                 }
             }
 
         }
-    
 
-    class metodai
+
+        class metodai
         {
             public string tekstas { get; set; }
 
@@ -124,23 +160,183 @@ namespace Matricav2
         private void Goal_SelectedIndexChanged(object sender, EventArgs e)
         {
             flowLayoutPanel1.Controls.Clear();
+            if (Method.SelectedValue.ToString() == "4")
+            {
+                switch (Goal.SelectedValue.ToString())
+                {
+                    case "1":
+                        lygtis.Visible = true;
+                        ispejimas4.Visible = true;
+                        lygtis2.Visible = false;
+                        min.Visible = true;
+                        max.Visible = true;
+                        Min_text.Visible = true;
+                        Max_text.Visible = true;
+                        break;
+                    case "2":
+                        lygtis.Visible = true;
+                        lygtis2.Visible = false;
+                        ispejimas4.Visible = true;
+                        min.Visible = true;
+                        max.Visible = true;
+                        Min_text.Visible = true;
+                        Max_text.Visible = true;
+                        break;
+                    case "3":
+                        lygtis.Visible = true;
+                        lygtis2.Visible = false;
+                        ispejimas4.Visible = true;
+                        min.Visible = true;
+                        max.Visible = true;
+                        Min_text.Visible = true;
+                        Max_text.Visible = true;
+                        break;
+                }
+
+            }
+            if (Method.SelectedValue.ToString() == "5")
+            {
+                switch (Goal.SelectedValue.ToString())
+                {
+                    case "1":
+                        interpol_iy3.Visible = false;
+                        interpol_ix4.Visible = false;
+                        interpol_4.Visible = false;
+                        break;
+
+                        case "2":
+                        interpol_iy3.Visible = true;
+                        interpol_ix4.Visible = true;
+                        interpol_4.Visible = true;
+                        break;
+
+                }
+            }
         }
         private void Method_SelectedIndexChanged(object sender, EventArgs e)
         {
 
 
-           
+            if (Method.SelectedValue.ToString() == "0")
+            {
+                Sarasai(0);
+                create.Enabled = false;
+                lygtis.Visible = false;
+                lygtis2.Visible = false;
+                ispejimas1.Visible = false;
+                ispejimas2.Visible = false;
+                ispejimas3.Visible = false;
+                ispejimas4.Visible = false;
+                X_cord.Visible = false;
+                y_cord.Visible = false;
+                Y_text.Visible = false;
+                Y_text.Visible = false;
+                min.Visible = false;
+                max.Visible = false;
+                Min_text.Visible = false;
+                Max_text.Visible = false;
+                interpolgroup.Visible = false;
+
+            }
             if (Method.SelectedValue.ToString() == "1")
             {
                 Sarasai(1);
+                create.Enabled = true;
+                lygtis.Visible = false;
+                lygtis2.Visible = false;
+                ispejimas1.Visible = true;
+                ispejimas2.Visible = true;
+                ispejimas3.Visible = true;
+                ispejimas4.Visible = false;
+                X_cord.Visible = true;
+                y_cord.Visible = true;
+                Y_text.Visible = true;
+                Y_text.Visible = true;
+                min.Visible = false;
+                max.Visible = false;
+                Min_text.Visible = false;
+                Max_text.Visible = false;
+                interpolgroup.Visible = false;
             }
             if (Method.SelectedValue.ToString() == "2")
             {
                 Sarasai(2);
-            }   
+                create.Enabled = true;
+                lygtis.Visible = false;
+                lygtis2.Visible = false;
+                ispejimas1.Visible = true;
+                ispejimas2.Visible = true;
+                ispejimas3.Visible = true;
+                ispejimas4.Visible = false;
+                X_cord.Visible = true;
+                y_cord.Visible = true;
+                Y_text.Visible = true;
+                Y_text.Visible = true;
+                min.Visible = false;
+                max.Visible = false;
+                Min_text.Visible = false;
+                Max_text.Visible = false;
+                interpolgroup.Visible = false;
+            }
             if (Method.SelectedValue.ToString() == "3")
             {
                 Sarasai(3);
+                create.Enabled = true;
+                lygtis.Visible = false;
+                lygtis2.Visible = false;
+                ispejimas1.Visible = true;
+                ispejimas2.Visible = true;
+                ispejimas3.Visible = true;
+                ispejimas4.Visible = false;
+                X_cord.Visible = true;
+                y_cord.Visible = true;
+                Y_text.Visible = true;
+                Y_text.Visible = true;
+                min.Visible = false;
+                max.Visible = false;
+                Min_text.Visible = false;
+                Max_text.Visible = false;
+                interpolgroup.Visible = false;
+            }
+            if (Method.SelectedValue.ToString() == "4")
+            {
+                Sarasai(4);
+                create.Enabled = false;
+                lygtis.Visible = false;
+                lygtis2.Visible = false;
+                ispejimas1.Visible = false;
+                ispejimas2.Visible = false;
+                ispejimas3.Visible = false;
+                ispejimas4.Visible = false;
+                X_cord.Visible = false;
+                y_cord.Visible = false;
+                Y_text.Visible = false;
+                Y_text.Visible = false;
+                min.Visible = false;
+                max.Visible = false;
+                Min_text.Visible = false;
+                Max_text.Visible = false;
+                interpolgroup.Visible = false;
+            }
+            if (Method.SelectedValue.ToString() == "5")
+            {
+                Sarasai(5);
+                create.Enabled = false;
+                lygtis.Visible = false;
+                lygtis2.Visible = false;
+                ispejimas1.Visible = false;
+                ispejimas2.Visible = false;
+                ispejimas3.Visible = false;
+                ispejimas4.Visible = false;
+                X_cord.Visible = false;
+                y_cord.Visible = false;
+                Y_text.Visible = false;
+                Y_text.Visible = false;
+                min.Visible = false;
+                max.Visible = false;
+                Min_text.Visible = false;
+                Max_text.Visible = false;
+                interpolgroup.Visible = true;
             }
             flowLayoutPanel1.Controls.Clear();
 
@@ -155,7 +351,8 @@ namespace Matricav2
 
         private void create_Click(object sender, EventArgs e)
         {
-            
+            x = (int)X_cord.Value;
+            y = (int)y_cord.Value;
             if (Method.SelectedValue.ToString() == "0")
             {
                 MessageBox.Show(
@@ -191,8 +388,7 @@ namespace Matricav2
             }
 
             flowLayoutPanel1.Controls.Clear();
-            x = (int)X_cord.Value;
-            y = (int)y_cord.Value;
+
             switch (Method.SelectedValue.ToString())
             {
                 case "1":
@@ -222,7 +418,7 @@ namespace Matricav2
                             l.TextAlign = HorizontalAlignment.Center;
 
                             flowLayoutPanel1.Controls.Add(l);
-                            
+
                             flowLayoutPanel1.SetFlowBreak(l, true);
 
                             for (int i = 0; i < y; i++)
@@ -359,7 +555,7 @@ namespace Matricav2
                         a.TextAlign = HorizontalAlignment.Center;
                         a.Text = "a" + (i + 1).ToString();
                         flowLayoutPanel1.Controls.Add(a);
-                        
+
                     }
                     TextBox b = new TextBox();
                     b.Size = new Size(33, 23);
@@ -369,18 +565,11 @@ namespace Matricav2
                     b.TextAlign = HorizontalAlignment.Center;
 
                     flowLayoutPanel1.Controls.Add(b);
-                    
-                   
-                    TextBox c = new TextBox();
-                    c.Size = new Size(33, 23);
-                    c.Text = "b";
-                    c.ReadOnly = true;
-                    c.BorderStyle = BorderStyle.None;
-                    c.TextAlign = HorizontalAlignment.Center;
 
-                    flowLayoutPanel1.Controls.Add(c);
-                    
-                    flowLayoutPanel1.SetFlowBreak(c, true);
+
+
+
+                    flowLayoutPanel1.SetFlowBreak(b, true);
 
                     for (int i = 0; i < y; i++)
                     {
@@ -391,18 +580,15 @@ namespace Matricav2
                             a.Size = new Size(33, 23);
                             a.Name = name_text.ToString();
                             flowLayoutPanel1.Controls.Add(a);
-                            
+
                         }
-                       
-                            TextBox d = new TextBox();
-                            d.Size = new Size(33, 23);
-                            d.Name = (i + 1).ToString() + (x + 1).ToString();
-                            flowLayoutPanel1.Controls.Add(d);
-                            TextBox g = new TextBox();
-                             g.Size = new Size(33, 23);
-                             g.Name = (i + 2).ToString() + (x + 2).ToString();
-                              flowLayoutPanel1.Controls.Add(g);
-                              flowLayoutPanel1.SetFlowBreak(g, true);
+
+                        TextBox d = new TextBox();
+                        d.Size = new Size(33, 23);
+                        d.Name = (i + 1).ToString() + (x + 1).ToString();
+                        flowLayoutPanel1.Controls.Add(d);
+
+                        flowLayoutPanel1.SetFlowBreak(d, true);
 
 
 
@@ -413,62 +599,93 @@ namespace Matricav2
 
 
         }
-        
+
         private void calculate_Click(object sender, EventArgs e)
         {
-            
-           
+
+
             string[,] matrica = new string[11, 11];
             string[,] matrica2 = new string[11, 11];
-            if (Goal.SelectedValue.ToString() == "1")
+            string[,] matrica3 = new string[11, 11];
+            switch (Method.SelectedValue.ToString())
             {
+                case "1":
 
-
-                for (int i = 0; i < y; i++)
-                {
-                    for (int j = 0; j < x; j++)
+                    switch (Goal.SelectedValue.ToString())
                     {
+                        case "1":
+                            for (int i = 0; i < y; i++)
+                            {
+                                for (int j = 0; j < x; j++)
+                                {
 
-                        matrica[i, j] = flowLayoutPanel1.Controls.Find((i + 1).ToString() + (j + 1).ToString(), true)[0].Text;
+                                    matrica[i, j] = flowLayoutPanel1.Controls.Find((i + 1).ToString() + (j + 1).ToString(), true)[0].Text;
 
+
+                                }
+                                matrica2[i, 0] = flowLayoutPanel1.Controls.Find((i + 1).ToString() + (x + 1).ToString(), true)[0].Text;
+                            }
+                            break;
+                        case "2":
+                            for (int i = 0; i < y; i++)
+                            {
+                                for (int j = 0; j < x; j++)
+                                {
+
+                                    matrica[i, j] = flowLayoutPanel1.Controls.Find((i + 1).ToString() + (j + 1).ToString(), true)[0].Text;
+
+                                }
+                            }
+                            break;
+                        case "3":
+                            for (int i = 0; i < y; i++)
+                            {
+                                for (int j = 0; j < x; j++)
+                                {
+
+                                    matrica[i, j] = flowLayoutPanel1.Controls.Find((i + 1).ToString() + (j + 1).ToString(), true)[0].Text;
+
+                                }
+                            }
+
+                            break;
+                    }
+                    break;
+                case "2":
+                    for (int i = 0; i < y; i++)
+                    {
+                        for (int j = 0; j < x - 1; j++)
+                        {
+
+                            matrica[i, j] = flowLayoutPanel1.Controls.Find((i + 1).ToString() + (j + 1).ToString(), true)[0].Text;
+
+
+                        }
+                        matrica2[i, 0] = flowLayoutPanel1.Controls.Find((i + 1).ToString() + (x).ToString(), true)[0].Text;
+                    }
+                    break;
+
+                case "3":
+                    for (int i = 0; i < y; i++)
+                    {
+                        for (int j = 0; j < x; j++)
+                        {
+
+                            matrica[i, j] = flowLayoutPanel1.Controls.Find((i + 1).ToString() + (j + 1).ToString(), true)[0].Text;
+
+
+                        }
+                        matrica2[i, 0] = flowLayoutPanel1.Controls.Find((i + 1).ToString() + (x + 1).ToString(), true)[0].Text;
 
                     }
-                    matrica2[i, 0] = flowLayoutPanel1.Controls.Find((i + 1).ToString() + (x + 1).ToString(), true)[0].Text;
-                }
+                    break;
 
             }
-            if (Method.SelectedValue.ToString() == "2")
-            {
 
 
-                for (int i = 0; i < y; i++)
-                {
-                    for (int j = 0; j < x - 1; j++)
-                    {
-
-                        matrica[i, j] = flowLayoutPanel1.Controls.Find((i + 1).ToString() + (j + 1).ToString(), true)[0].Text;
 
 
-                    }
-                    matrica2[i, 0] = flowLayoutPanel1.Controls.Find((i + 1).ToString() + (x).ToString(), true)[0].Text;
-                }
-
-            }
-            else
-            {
-
-
-                for (int i = 0; i < y; i++)
-                {
-                    for (int j = 0; j < x; j++)
-                    {
-
-                        matrica[i, j] = flowLayoutPanel1.Controls.Find((i + 1).ToString() + (j + 1).ToString(), true)[0].Text;
-
-                    }
-                }
-            }
-
+            /*
             for (int i = 0; i < y; i++)
             {
                 if (Method.SelectedValue.ToString() == "2")
@@ -501,119 +718,380 @@ namespace Matricav2
                     }
                 }
             }
-
-            if (Method.SelectedValue.ToString() == "2")
-            {
-
-                x = x - 1;
-            }
+            */
             double[,] matrica_double = new double[y, x];
             double[,] matrica_double2 = new double[y, 1];
+            double[] matrica_double3 = new double[y];
+            double[] matrica_double4 = new double[y];
 
-            for (int i = 0; i < y; i++)
+
+
+
+            switch (Method.SelectedValue.ToString())
             {
+                case "1":
 
-                for (int j = 0; j < x; j++)
-                {
+                    switch (Goal.SelectedValue.ToString())
+                    {
+                        case "1":
+                            for (int i = 0; i < y; i++)
+                            {
 
-                    matrica_double[i, j] = Convert.ToDouble(matrica[i, j]);
-                    //Console.WriteLine(matrica_double[i,j]);
+                                for (int j = 0; j < x; j++)
+                                {
+
+                                    matrica_double[i, j] = Convert.ToDouble(matrica[i, j]);
 
 
-                }
-                matrica_double2[i, 0] = Convert.ToDouble(matrica2[i, 0]);
-                //Console.WriteLine(matrica_double2[i, 0]);
-                //Console.WriteLine("LN");
+
+                                }
+                                matrica_double2[i, 0] = Convert.ToDouble(matrica2[i, 0]);
+
+                            }
+                            break;
+                        case "2":
+                            for (int i = 0; i < y; i++)
+                            {
+
+                                for (int j = 0; j < x; j++)
+                                {
+
+                                    matrica_double[i, j] = Convert.ToDouble(matrica[i, j]);
+
+
+
+                                }
+                                matrica_double2[i, 0] = Convert.ToDouble(matrica2[i, 0]);
+
+                            }
+                            break;
+                        case "3":
+                            for (int i = 0; i < y; i++)
+                            {
+
+                                for (int j = 0; j < x; j++)
+                                {
+
+                                    matrica_double[i, j] = Convert.ToDouble(matrica[i, j]);
+
+
+
+                                }
+                                matrica_double2[i, 0] = Convert.ToDouble(matrica2[i, 0]);
+
+                            }
+
+                            break;
+                    }
+                    break;
+                case "2":
+                    for (int i = 0; i < y; i++)
+                    {
+
+                        for (int j = 0; j < x - 1; j++)
+                        {
+
+                            matrica_double[i, j] = Convert.ToDouble(matrica[i, j]);
+
+
+
+                        }
+                        matrica_double2[i, 0] = Convert.ToDouble(matrica2[i, 0]);
+
+                    }
+                    break;
+
+                case "3":
+                    for (int i = 0; i < y; i++)
+                    {
+
+                        for (int j = 0; j < x; j++)
+                        {
+
+                            matrica_double[i, j] = Convert.ToDouble(matrica[i, j]);
+
+
+
+                        }
+                        matrica_double3[i] = Convert.ToDouble(matrica2[i, 0]);
+                        matrica_double4[i] = Convert.ToDouble(matrica3[i, 0]);
+
+                    }
+                    break;
+
             }
             var A = Matrix<double>.Build.DenseOfArray(matrica_double);
             var B = Matrix<double>.Build.DenseOfArray(matrica_double2);
-             Console.WriteLine(A);
-            // Console.WriteLine(" MATRIX A");
-            // Console.WriteLine(B);
-            //  Console.WriteLine(" MATRIX B");
-            //A.Solve(B);
-            //  Console.WriteLine(A.Solve(B));
-            //   var determinant = A.Determinant();
-            //  Console.WriteLine(determinant);
-           
-            //var D = A.Inverse();
-            // Console.WriteLine(D);
-            if (Method.SelectedValue.ToString() == "1")
+            Vector<double> C = Vector<double>.Build.DenseOfArray(matrica_double3);
+            Vector<double> G = Vector<double>.Build.DenseOfArray(matrica_double4);
+            var metodo_patikra = Method.SelectedValue.ToString();
+            if (Convert.ToDouble(metodo_patikra.ToString()) < 4)
             {
-                if (Goal.SelectedValue.ToString() == "1")
-                {
-                    Console.WriteLine("Gauso metodas");
-                    Console.WriteLine(A.Solve(B));
-                }
-                if (Goal.SelectedValue.ToString() == "2")
-                {
-                    Console.WriteLine("Determinantas");
-                    var determinant = A.Determinant();
-                    Console.WriteLine(determinant);
-                }
-                if (Goal.SelectedValue.ToString() == "3")
-                {
-                    var D = A.Inverse();
-                    if (trupmena.Checked == false)
+
+                Console.WriteLine(A);
+                Console.WriteLine(B);
+                Console.WriteLine(C);
+                Console.WriteLine(G);
+            }
+            switch (Method.SelectedValue.ToString())
+            {
+                case "1":
+
+                    switch (Goal.SelectedValue.ToString())
                     {
-                        Console.WriteLine("Atvirkstine matrica");
-
-                        for (int i = 0; i < y; i++)
-                        {
-                            // matrica_test[i] = ;
-                            for (int j = 0; j < x; j++)
+                        case "1":
+                            Console.WriteLine("Gauso metodas");
+                            Console.WriteLine(A.Solve(B));
+                            break;
+                        case "2":
+                            Console.WriteLine("Determinantas");
+                            var determinant = A.Determinant();
+                            Console.WriteLine(determinant);
+                            break;
+                        case "3":
+                            Console.WriteLine("Atvirkstine matrica");
+                            var D = A.Inverse();
+                            for (int i = 0; i < y; i++)
                             {
-
-
-                                D[i, j] = Math.Round(D[i, j], 3);
-                                if (D[i, j] == -0)
+                                // matrica_test[i] = ;
+                                for (int j = 0; j < x; j++)
                                 {
-                                    D[i, j] = 0;
+                                    D[i, j] = Math.Round(D[i, j], 3);
+                                    if (D[i, j] == -0)
+                                    {
+                                        D[i, j] = 0;
+                                    }
                                 }
-
-
                             }
-                        }
-
-                        Console.WriteLine(D);
+                            Console.WriteLine(D);
+                            break;
                     }
-                    else
+                    break;
+                case "2":
+                    Console.WriteLine("Pagrindinio elemento metodas");
+                    Console.WriteLine(A.Solve(B));
+                    break;
+
+                case "3":
+
+                    IIterativeSolver<double> solver = new GpBiCg();
+                    IPreconditioner<double> DiagonalPreconditioner = new DiagonalPreconditioner();
+                    Iterator<double> iter = new Iterator<double>();
+                    var O = A.SolveIterative(C, solver, iter, DiagonalPreconditioner);
+
+                    Console.WriteLine(O);
+
+                    break;
+
+                case "4":
+                    var a = SymbolicExpression.Variable("x");
+
+                    //Func<double, double> test = y => y * y * y + 3 * y * y - 3;
+
+                    // var root = Bisection.FindRootExpand(test,0,2);
+                    // 
+                    // Console.WriteLine(root);
+                    // Func<double, double> equation = y => Math.Pow(2, y);
+                    // Func<double, double> equation2 = y => -5 * (y * y) + 3;
+                    // root = NewtonRaphson.FindRoot(equation,equation2,1,0);
+                    string funkcija = lygtis.Text;
+                    String.Join(" ", funkcija.ToList());
+                    SymbolicExpression expression = SymbolicExpression.Parse(funkcija);
+
+
+                    //SymbolicExpression expression2 = SymbolicExpression.Parse(funkcija2);
+
+                    SymbolicExpression expression2 = expression.Differentiate(a);
+                    Console.WriteLine(expression2.ToString());
+                    //Console.WriteLine(derivative.ToString());
+
+                    //Console.WriteLine("Isvestine");
+                    //Console.WriteLine(isvestine);
+
+                    // Func<double, double> function = l => isvestine;
+
+                    // var root = FindRoots.OfFunction(function, 0, 10);
+                    // Func<double, double> function = a => Convert.ToDouble(lygtis.Text);
+
+                    //NCalc.Expression expression2 = new NCalc.Expression(funkcija);
+                    //Console.WriteLine(expression2);
+                    /*
+                    Func<double, double> function = a =>
                     {
-                        Console.WriteLine("Atvirkstine matrica su Trupmena");
-                        for (int i = 0; i < y; i++)
-                        {
+                        expression2.Parameters["a"] = a;
+                        Console.WriteLine((double)expression2.Evaluate());
+                        return (double)expression2.Evaluate();
+                    };
+                    */
+                    double min_double = Convert.ToDouble(min.Text);
+                    double max_double = Convert.ToDouble(max.Text);
+                    double acc = 0.001;
+                    int iterations = 10;
+                    double root = 0;
 
-                            for (int j = 0; j < x; j++)
-                            {
+                    //Console.WriteLine(function);
+                    // a* a *a + 3 * a * a - 3;
+                    switch (Goal.SelectedValue.ToString())
+                    {
+                        case "1":
+                            Func<double, double> function2 = expression.Compile("x");
+
+                            root = Bisection.FindRootExpand(function2, min_double, max_double, acc, iterations);
+
+                            //var root = Bisection.FindRoot(function, min_double, max_double);
+                            Console.WriteLine(root.ToString("F3"));
+                            break;
+
+                        case "2":
+
+                            Func<double, double> function3 = expression.Compile("x");
+                            Func<double, double> function4 = expression2.Compile("x");
+                            root = NewtonRaphson.FindRoot(function3, function4, min_double, max_double, acc, iterations);
+                            Console.WriteLine(root.ToString("F3"));
+
+                            break;
+
+                        case "3":
 
 
-                                D[i, j] = Math.Round(D[i, j], 3);
-                                var rounded = Fraction.FromDoubleRounded(D[i, j]);
-                                Console.Write(rounded);
-                                Console.Write(" ");
-                            }
-                            Console.WriteLine();
-                        }
+
+                            Func<double, double> function5 = expression.Compile("x");
+                            Func<double, double> function6 = expression2.Compile("x");
+                            root = NewtonRaphson.FindRoot(function5, function6, min_double, max_double, acc, iterations);
+                            Console.WriteLine(root.ToString("F3"));
+                            break;
+
+
+
+
+
+
                     }
+                    break;
+                case "5":
 
-                }
-            }
-            if (Method.SelectedValue.ToString() == "2")
-            {
-                Console.WriteLine("Pagrindinio elemento metodas");
-                Console.WriteLine(A.Solve(B));
-            }
-            if (Method.SelectedValue.ToString() == "2")
-            {
+                    //Interpoliavimas
+                    switch (Goal.SelectedValue.ToString())
+                    {
+                        case "2":
+                            
+                            var ix1 = Convert.ToDouble(interpol_ix1.Text.ToString());
+                            var ix2 = Convert.ToDouble(interpol_ix2.Text.ToString());
+                            var ix3 = Convert.ToDouble(interpol_ix3.Text.ToString());
+                            var iy1 = Convert.ToDouble(interpol_iy1.Text.ToString());
+                            var iy2 = Convert.ToDouble(interpol_iy2.Text.ToString());
+                            var iy3 = Convert.ToDouble(interpol_iy3.Text.ToString());
+                            double xd = Convert.ToDouble(interpol_ix4.Text.ToString());
+                            double[] iy = { iy1, iy2, iy3 };
+                            Matrix<double> M = DenseMatrix.OfArray(new double[,]
+                            {
+                               { ix1 * ix1, ix1, 1 },
+                               { ix2 * ix2, ix2, 1 },
+                               { ix3 * ix3, ix3, 1 }
+                             });
+                            Vector<double> vectorY = Vector<double>.Build.Dense(iy);
+                            Vector<double> koff = M.Solve(vectorY);
 
-                x = x + 1;
+
+                            double a1 = koff[0];
+                            double b1 = koff[1];
+                            double c1 = koff[2];
+
+                            double kvadratinterpoliavimas = (a1 * xd * xd) + (b1 * xd) + c1;
+                            Console.WriteLine(kvadratinterpoliavimas.ToString("F3"));
+                            break;
+
+                        case "1":
+                            
+                           ix1 = Convert.ToDouble(interpol_ix1.Text.ToString());
+                           ix2 = Convert.ToDouble(interpol_ix2.Text.ToString());
+                           iy1 = Convert.ToDouble(interpol_iy1.Text.ToString());
+                           iy2 = Convert.ToDouble(interpol_iy2.Text.ToString());
+                           xd = Convert.ToDouble(interpol_ix3.Text.ToString());
+                            double tiesinisinterpol = iy1 + (xd - ix1) * (iy2 - iy1) / (ix2 - ix1);
+                            Console.WriteLine(tiesinisinterpol.ToString("F3"));
+                            break;
+
+                    }
+                    break;
+
+
             }
+            /*
+             if (Method.SelectedValue.ToString() == "1")
+             {
+                 if (Goal.SelectedValue.ToString() == "1")
+                 {
+                     Console.WriteLine("Gauso metodas");
+                     Console.WriteLine(A.Solve(B));
+                 }
+                 if (Goal.SelectedValue.ToString() == "2")
+                 {
+                     Console.WriteLine("Determinantas");
+                     var determinant = A.Determinant();
+                     Console.WriteLine(determinant);
+                 }
+                 if (Goal.SelectedValue.ToString() == "3")
+                 {
+                     var D = A.Inverse();
+                     if (trupmena.Checked == false)
+                     {
+                         Console.WriteLine("Atvirkstine matrica");
+
+                         for (int i = 0; i < y; i++)
+                         {
+                             // matrica_test[i] = ;
+                             for (int j = 0; j < x; j++)
+                             {
+
+
+                                 D[i, j] = Math.Round(D[i, j], 3);
+                                 if (D[i, j] == -0)
+                                 {
+                                     D[i, j] = 0;
+                                 }
+
+
+                             }
+                         }
+
+                         Console.WriteLine(D);
+                     }
+                     else
+                     {
+                         Console.WriteLine("Atvirkstine matrica su Trupmena");
+                         for (int i = 0; i < y; i++)
+                         {
+
+                             for (int j = 0; j < x; j++)
+                             {
+
+
+                                 D[i, j] = Math.Round(D[i, j], 3);
+                                 var rounded = Fraction.FromDoubleRounded(D[i, j]);
+                                 Console.Write(rounded);
+                                 Console.Write(" ");
+                             }
+                             Console.WriteLine();
+                         }
+                     }
+
+                 }
+             }
+             if (Method.SelectedValue.ToString() == "2")
+             {
+                 Console.WriteLine("Pagrindinio elemento metodas");
+                 Console.WriteLine(A.Solve(B));
+             }
+            */
+
 
 
 
 
 
         }
+
         private static double FractionToDouble(string fraction)
         {
             double result;
@@ -649,6 +1127,11 @@ namespace Matricav2
         }
 
         private void textBox1_TextChanged_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ispejimas4_TextChanged(object sender, EventArgs e)
         {
 
         }
