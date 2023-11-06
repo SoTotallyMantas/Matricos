@@ -159,7 +159,10 @@ namespace Matricav2
 
         private void Goal_SelectedIndexChanged(object sender, EventArgs e)
         {
-            flowLayoutPanel1.Controls.Clear();
+           if(Method.SelectedValue.ToString() != "3")
+            {
+                flowLayoutPanel1.Controls.Clear();
+            }
             if (Method.SelectedValue.ToString() == "4")
             {
                 switch (Goal.SelectedValue.ToString())
@@ -236,6 +239,7 @@ namespace Matricav2
                 Min_text.Visible = false;
                 Max_text.Visible = false;
                 interpolgroup.Visible = false;
+                flowLayoutPanel1.Controls.Clear();
 
             }
             if (Method.SelectedValue.ToString() == "1")
@@ -277,6 +281,7 @@ namespace Matricav2
                 Min_text.Visible = false;
                 Max_text.Visible = false;
                 interpolgroup.Visible = false;
+                flowLayoutPanel1.Controls.Clear();
             }
             if (Method.SelectedValue.ToString() == "3")
             {
@@ -317,6 +322,7 @@ namespace Matricav2
                 Min_text.Visible = false;
                 Max_text.Visible = false;
                 interpolgroup.Visible = false;
+                flowLayoutPanel1.Controls.Clear();
             }
             if (Method.SelectedValue.ToString() == "5")
             {
@@ -337,8 +343,10 @@ namespace Matricav2
                 Min_text.Visible = false;
                 Max_text.Visible = false;
                 interpolgroup.Visible = true;
+                flowLayoutPanel1.Controls.Clear();
             }
-            flowLayoutPanel1.Controls.Clear();
+            
+            
 
 
 
@@ -828,10 +836,10 @@ namespace Matricav2
             if (Convert.ToDouble(metodo_patikra.ToString()) < 4)
             {
 
-                Console.WriteLine(A);
-                Console.WriteLine(B);
-                Console.WriteLine(C);
-                Console.WriteLine(G);
+                //Console.WriteLine(A);
+               // Console.WriteLine(B);
+               // Console.WriteLine(C);
+                //Console.WriteLine(G);
             }
             switch (Method.SelectedValue.ToString())
             {
@@ -874,12 +882,25 @@ namespace Matricav2
 
                 case "3":
 
-                    IIterativeSolver<double> solver = new GpBiCg();
+                    IIterativeSolver<double> solver = new TFQMR();
                     IPreconditioner<double> DiagonalPreconditioner = new DiagonalPreconditioner();
                     Iterator<double> iter = new Iterator<double>();
-                    var O = A.SolveIterative(C, solver, iter, DiagonalPreconditioner);
+                    var O = C;
+            try
+                    { 
+                         O = A.SolveIterative(C, solver, iter, DiagonalPreconditioner);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Failed");
+                    }
+                    Console.WriteLine("Iteracijos sprendinis");
+                    var O_size = O.Count;
+                    for (int i=0;i<=O_size-1;i++)
+                    {
+                        Console.WriteLine(O[i].ToString("F4"));
+                    }
 
-                    Console.WriteLine(O);
 
                     break;
 
@@ -902,7 +923,7 @@ namespace Matricav2
                     //SymbolicExpression expression2 = SymbolicExpression.Parse(funkcija2);
 
                     SymbolicExpression expression2 = expression.Differentiate(a);
-                    Console.WriteLine(expression2.ToString());
+                    //Console.WriteLine(expression2.ToString());
                     //Console.WriteLine(derivative.ToString());
 
                     //Console.WriteLine("Isvestine");
@@ -926,7 +947,7 @@ namespace Matricav2
                     double min_double = Convert.ToDouble(min.Text);
                     double max_double = Convert.ToDouble(max.Text);
                     double acc = 0.001;
-                    int iterations = 10;
+                    int iterations = 30;
                     double root = 0;
 
                     //Console.WriteLine(function);
@@ -935,9 +956,14 @@ namespace Matricav2
                     {
                         case "1":
                             Func<double, double> function2 = expression.Compile("x");
-
-                            root = Bisection.FindRootExpand(function2, min_double, max_double, acc, iterations);
-
+                            try
+                            {
+                                root = Bisection.FindRoot(function2, min_double, max_double, acc, iterations);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine("Failed");
+                            }
                             //var root = Bisection.FindRoot(function, min_double, max_double);
                             Console.WriteLine(root.ToString("F3"));
                             break;
@@ -946,7 +972,14 @@ namespace Matricav2
 
                             Func<double, double> function3 = expression.Compile("x");
                             Func<double, double> function4 = expression2.Compile("x");
-                            root = NewtonRaphson.FindRoot(function3, function4, min_double, max_double, acc, iterations);
+                            try
+                            {
+                                root = RobustNewtonRaphson.FindRoot(function3, function4, min_double, max_double, acc, iterations);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine("Failed");
+                            }   
                             Console.WriteLine(root.ToString("F3"));
 
                             break;
@@ -957,7 +990,14 @@ namespace Matricav2
 
                             Func<double, double> function5 = expression.Compile("x");
                             Func<double, double> function6 = expression2.Compile("x");
-                            root = NewtonRaphson.FindRoot(function5, function6, min_double, max_double, acc, iterations);
+                            try
+                            {
+                                root = RobustNewtonRaphson.FindRoot(function5, function6, min_double, max_double, acc, iterations);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine("Failed");
+                            }
                             Console.WriteLine(root.ToString("F3"));
                             break;
 
