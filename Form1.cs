@@ -159,7 +159,7 @@ namespace Matricav2
 
         private void Goal_SelectedIndexChanged(object sender, EventArgs e)
         {
-           if(Method.SelectedValue.ToString() != "3")
+            if (Method.SelectedValue.ToString() != "3")
             {
                 flowLayoutPanel1.Controls.Clear();
             }
@@ -175,6 +175,9 @@ namespace Matricav2
                         max.Visible = true;
                         Min_text.Visible = true;
                         Max_text.Visible = true;
+                        accuracy.Visible = true;
+                        epsilon.Visible = true;
+
                         break;
                     case "2":
                         lygtis.Visible = true;
@@ -184,6 +187,9 @@ namespace Matricav2
                         max.Visible = true;
                         Min_text.Visible = true;
                         Max_text.Visible = true;
+                        accuracy.Visible = true;
+                        epsilon.Visible = true;
+
                         break;
                     case "3":
                         lygtis.Visible = true;
@@ -193,6 +199,9 @@ namespace Matricav2
                         max.Visible = true;
                         Min_text.Visible = true;
                         Max_text.Visible = true;
+                        accuracy.Visible = true;
+                        epsilon.Visible = true;
+
                         break;
                 }
 
@@ -207,7 +216,7 @@ namespace Matricav2
                         interpol_4.Visible = false;
                         break;
 
-                        case "2":
+                    case "2":
                         interpol_iy3.Visible = true;
                         interpol_ix4.Visible = true;
                         interpol_4.Visible = true;
@@ -219,7 +228,7 @@ namespace Matricav2
         private void Method_SelectedIndexChanged(object sender, EventArgs e)
         {
 
-
+            braizimolinkas.Visible = false;
             if (Method.SelectedValue.ToString() == "0")
             {
                 Sarasai(0);
@@ -233,12 +242,15 @@ namespace Matricav2
                 X_cord.Visible = false;
                 y_cord.Visible = false;
                 Y_text.Visible = false;
-                Y_text.Visible = false;
+                X_text.Visible = false;
                 min.Visible = false;
                 max.Visible = false;
                 Min_text.Visible = false;
                 Max_text.Visible = false;
                 interpolgroup.Visible = false;
+                accuracy.Visible = false;
+                epsilon.Visible = false;
+
                 flowLayoutPanel1.Controls.Clear();
 
             }
@@ -254,12 +266,14 @@ namespace Matricav2
                 ispejimas4.Visible = false;
                 X_cord.Visible = true;
                 y_cord.Visible = true;
-                Y_text.Visible = true;
+                X_text.Visible = true;
                 Y_text.Visible = true;
                 min.Visible = false;
                 max.Visible = false;
                 Min_text.Visible = false;
                 Max_text.Visible = false;
+                accuracy.Visible = false;
+                epsilon.Visible = false;
                 interpolgroup.Visible = false;
             }
             if (Method.SelectedValue.ToString() == "2")
@@ -274,13 +288,15 @@ namespace Matricav2
                 ispejimas4.Visible = false;
                 X_cord.Visible = true;
                 y_cord.Visible = true;
-                Y_text.Visible = true;
+                X_text.Visible = true;
                 Y_text.Visible = true;
                 min.Visible = false;
                 max.Visible = false;
                 Min_text.Visible = false;
                 Max_text.Visible = false;
                 interpolgroup.Visible = false;
+                accuracy.Visible = false;
+                epsilon.Visible = false;
                 flowLayoutPanel1.Controls.Clear();
             }
             if (Method.SelectedValue.ToString() == "3")
@@ -295,13 +311,15 @@ namespace Matricav2
                 ispejimas4.Visible = false;
                 X_cord.Visible = true;
                 y_cord.Visible = true;
-                Y_text.Visible = true;
+                X_text.Visible = true;
                 Y_text.Visible = true;
                 min.Visible = false;
                 max.Visible = false;
                 Min_text.Visible = false;
                 Max_text.Visible = false;
                 interpolgroup.Visible = false;
+                accuracy.Visible = false;
+                epsilon.Visible = false;
             }
             if (Method.SelectedValue.ToString() == "4")
             {
@@ -315,13 +333,16 @@ namespace Matricav2
                 ispejimas4.Visible = false;
                 X_cord.Visible = false;
                 y_cord.Visible = false;
-                Y_text.Visible = false;
+                X_text.Visible = false;
                 Y_text.Visible = false;
                 min.Visible = false;
                 max.Visible = false;
                 Min_text.Visible = false;
                 Max_text.Visible = false;
                 interpolgroup.Visible = false;
+                accuracy.Visible = false;
+                epsilon.Visible = false;
+                braizimolinkas.Visible = true;
                 flowLayoutPanel1.Controls.Clear();
             }
             if (Method.SelectedValue.ToString() == "5")
@@ -336,17 +357,19 @@ namespace Matricav2
                 ispejimas4.Visible = false;
                 X_cord.Visible = false;
                 y_cord.Visible = false;
-                Y_text.Visible = false;
+                X_text.Visible = false;
                 Y_text.Visible = false;
                 min.Visible = false;
                 max.Visible = false;
                 Min_text.Visible = false;
                 Max_text.Visible = false;
                 interpolgroup.Visible = true;
+                accuracy.Visible = false;
+                epsilon.Visible = false;
                 flowLayoutPanel1.Controls.Clear();
             }
-            
-            
+
+
 
 
 
@@ -837,8 +860,8 @@ namespace Matricav2
             {
 
                 //Console.WriteLine(A);
-               // Console.WriteLine(B);
-               // Console.WriteLine(C);
+                // Console.WriteLine(B);
+                // Console.WriteLine(C);
                 //Console.WriteLine(G);
             }
             switch (Method.SelectedValue.ToString())
@@ -886,9 +909,9 @@ namespace Matricav2
                     IPreconditioner<double> DiagonalPreconditioner = new DiagonalPreconditioner();
                     Iterator<double> iter = new Iterator<double>();
                     var O = C;
-            try
-                    { 
-                         O = A.SolveIterative(C, solver, iter, DiagonalPreconditioner);
+                    try
+                    {
+                        O = A.SolveIterative(C, solver, iter, DiagonalPreconditioner);
                     }
                     catch (Exception ex)
                     {
@@ -896,7 +919,7 @@ namespace Matricav2
                     }
                     Console.WriteLine("Iteracijos sprendinis");
                     var O_size = O.Count;
-                    for (int i=0;i<=O_size-1;i++)
+                    for (int i = 0; i <= O_size - 1; i++)
                     {
                         Console.WriteLine(O[i].ToString("F4"));
                     }
@@ -934,21 +957,27 @@ namespace Matricav2
                     // var root = FindRoots.OfFunction(function, 0, 10);
                     // Func<double, double> function = a => Convert.ToDouble(lygtis.Text);
 
-                    //NCalc.Expression expression2 = new NCalc.Expression(funkcija);
-                    //Console.WriteLine(expression2);
-                    /*
-                    Func<double, double> function = a =>
-                    {
-                        expression2.Parameters["a"] = a;
-                        Console.WriteLine((double)expression2.Evaluate());
-                        return (double)expression2.Evaluate();
-                    };
-                    */
-                    double min_double = Convert.ToDouble(min.Text);
-                    double max_double = Convert.ToDouble(max.Text);
+                    
+                    double min_double = 0;
+                    double max_double = 0;
                     double acc = 0.001;
+                    int decimalPlaces = 0;
+
+
+                    try
+                    {
+                        min_double = Convert.ToDouble(min.Text);
+                        max_double = Convert.ToDouble(max.Text);
+                        acc = Convert.ToDouble(accuracy.Text);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Min , Max arba Epsilon langai nera uzpildyti");
+                    }
+
                     int iterations = 30;
                     double root = 0;
+                    var value = root;
 
                     //Console.WriteLine(function);
                     // a* a *a + 3 * a * a - 3;
@@ -965,7 +994,14 @@ namespace Matricav2
                                 Console.WriteLine("Failed");
                             }
                             //var root = Bisection.FindRoot(function, min_double, max_double);
-                            Console.WriteLine(root.ToString("F3"));
+
+                            value = root;
+                            while (acc < 1)
+                            {
+                                acc *= 10;
+                                decimalPlaces++;
+                            }
+                            Console.WriteLine(root.ToString("F" + decimalPlaces));
                             break;
 
                         case "2":
@@ -975,12 +1011,21 @@ namespace Matricav2
                             try
                             {
                                 root = RobustNewtonRaphson.FindRoot(function3, function4, min_double, max_double, acc, iterations);
+                               
                             }
                             catch (Exception ex)
                             {
                                 Console.WriteLine("Failed");
-                            }   
-                            Console.WriteLine(root.ToString("F3"));
+                            }
+                            
+                            //Console.WriteLine(root.ToString("F3"));
+                            value = root;
+                            while (acc < 1)
+                            {
+                                acc *= 10;
+                                decimalPlaces++;
+                            }
+                            Console.WriteLine(root.ToString("F" + decimalPlaces));
 
                             break;
 
@@ -993,12 +1038,21 @@ namespace Matricav2
                             try
                             {
                                 root = RobustNewtonRaphson.FindRoot(function5, function6, min_double, max_double, acc, iterations);
+                                
                             }
                             catch (Exception ex)
                             {
                                 Console.WriteLine("Failed");
                             }
-                            Console.WriteLine(root.ToString("F3"));
+                            
+                            //Console.WriteLine(root.ToString("F3"));
+                            value = root;
+                            while (acc < 1)
+                            {
+                                acc *= 10;
+                                decimalPlaces++;
+                            }
+                            Console.WriteLine(root.ToString("F" + decimalPlaces));
                             break;
 
 
@@ -1014,7 +1068,7 @@ namespace Matricav2
                     switch (Goal.SelectedValue.ToString())
                     {
                         case "2":
-                            
+
                             var ix1 = Convert.ToDouble(interpol_ix1.Text.ToString());
                             var ix2 = Convert.ToDouble(interpol_ix2.Text.ToString());
                             var ix3 = Convert.ToDouble(interpol_ix3.Text.ToString());
@@ -1042,12 +1096,12 @@ namespace Matricav2
                             break;
 
                         case "1":
-                            
-                           ix1 = Convert.ToDouble(interpol_ix1.Text.ToString());
-                           ix2 = Convert.ToDouble(interpol_ix2.Text.ToString());
-                           iy1 = Convert.ToDouble(interpol_iy1.Text.ToString());
-                           iy2 = Convert.ToDouble(interpol_iy2.Text.ToString());
-                           xd = Convert.ToDouble(interpol_ix3.Text.ToString());
+
+                            ix1 = Convert.ToDouble(interpol_ix1.Text.ToString());
+                            ix2 = Convert.ToDouble(interpol_ix2.Text.ToString());
+                            iy1 = Convert.ToDouble(interpol_iy1.Text.ToString());
+                            iy2 = Convert.ToDouble(interpol_iy2.Text.ToString());
+                            xd = Convert.ToDouble(interpol_ix3.Text.ToString());
                             double tiesinisinterpol = iy1 + (xd - ix1) * (iy2 - iy1) / (ix2 - ix1);
                             Console.WriteLine(tiesinisinterpol.ToString("F3"));
                             break;
@@ -1174,6 +1228,11 @@ namespace Matricav2
         private void ispejimas4_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void braizimolinkas_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo("https://www.mat.lt/irankiai/grafikas.html") { UseShellExecute = true });
         }
     }
 }

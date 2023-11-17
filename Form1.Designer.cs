@@ -63,6 +63,10 @@
             interpol_ix4 = new TextBox();
             interpol_4 = new TextBox();
             interpolgroup = new GroupBox();
+            epsilon = new TextBox();
+            accuracy = new TextBox();
+            braizimolinkas = new LinkLabel();
+            formsPlot1 = new ScottPlot.FormsPlot();
             ((System.ComponentModel.ISupportInitialize)X_cord).BeginInit();
             ((System.ComponentModel.ISupportInitialize)y_cord).BeginInit();
             interpolgroup.SuspendLayout();
@@ -131,6 +135,7 @@
             Method.Name = "Method";
             Method.Size = new Size(223, 23);
             Method.TabIndex = 4;
+            Method.TabStop = false;
             Method.SelectedIndexChanged += Method_SelectedIndexChanged;
             // 
             // Goal
@@ -141,6 +146,7 @@
             Goal.Name = "Goal";
             Goal.Size = new Size(223, 23);
             Goal.TabIndex = 5;
+            Goal.TabStop = false;
             Goal.SelectedIndexChanged += Goal_SelectedIndexChanged;
             // 
             // flowLayoutPanel1
@@ -155,7 +161,7 @@
             // lygtis
             // 
             lygtis.Anchor = AnchorStyles.None;
-            lygtis.Location = new Point(51, 46);
+            lygtis.Location = new Point(51, 50);
             lygtis.Name = "lygtis";
             lygtis.Size = new Size(195, 23);
             lygtis.TabIndex = 14;
@@ -182,6 +188,7 @@
             create.Name = "create";
             create.Size = new Size(75, 23);
             create.TabIndex = 7;
+            create.TabStop = false;
             create.Text = "Sukurti";
             create.UseVisualStyleBackColor = true;
             create.Click += create_Click;
@@ -192,6 +199,7 @@
             calculate.Name = "calculate";
             calculate.Size = new Size(75, 23);
             calculate.TabIndex = 8;
+            calculate.TabStop = false;
             calculate.Text = "Skaiciuoti";
             calculate.UseVisualStyleBackColor = true;
             calculate.Click += calculate_Click;
@@ -256,10 +264,10 @@
             ispejimas4.Location = new Point(483, 53);
             ispejimas4.Name = "ispejimas4";
             ispejimas4.ReadOnly = true;
-            ispejimas4.Size = new Size(176, 16);
+            ispejimas4.Size = new Size(223, 16);
             ispejimas4.TabIndex = 15;
             ispejimas4.TabStop = false;
-            ispejimas4.Text = "*Pvz: a^3+3*a^2-3";
+            ispejimas4.Text = "*Pvz: x^3+3*x^2-3 , ln(x), lg(x), log(x,x)";
             ispejimas4.Visible = false;
             ispejimas4.TextChanged += ispejimas4_TextChanged;
             // 
@@ -310,7 +318,7 @@
             // lygtis2
             // 
             lygtis2.Anchor = AnchorStyles.None;
-            lygtis2.Location = new Point(252, 46);
+            lygtis2.Location = new Point(503, 143);
             lygtis2.Name = "lygtis2";
             lygtis2.Size = new Size(225, 23);
             lygtis2.TabIndex = 20;
@@ -461,18 +469,68 @@
             interpolgroup.Controls.Add(interpol_y);
             interpolgroup.Location = new Point(51, 46);
             interpolgroup.Name = "interpolgroup";
-            interpolgroup.Size = new Size(286, 120);
+            interpolgroup.Size = new Size(350, 120);
             interpolgroup.TabIndex = 34;
             interpolgroup.TabStop = false;
             interpolgroup.Visible = false;
+            // 
+            // epsilon
+            // 
+            epsilon.BackColor = SystemColors.Control;
+            epsilon.BorderStyle = BorderStyle.None;
+            epsilon.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            epsilon.Location = new Point(131, 94);
+            epsilon.Name = "epsilon";
+            epsilon.ReadOnly = true;
+            epsilon.Size = new Size(34, 22);
+            epsilon.TabIndex = 35;
+            epsilon.TabStop = false;
+            epsilon.Text = "ɛ";
+            epsilon.TextAlign = HorizontalAlignment.Center;
+            epsilon.Visible = false;
+            // 
+            // accuracy
+            // 
+            accuracy.Location = new Point(131, 116);
+            accuracy.Name = "accuracy";
+            accuracy.Size = new Size(34, 23);
+            accuracy.TabIndex = 36;
+            accuracy.Visible = false;
+            // 
+            // braizimolinkas
+            // 
+            braizimolinkas.AutoSize = true;
+            braizimolinkas.Location = new Point(171, 342);
+            braizimolinkas.Name = "braizimolinkas";
+            braizimolinkas.Size = new Size(135, 15);
+            braizimolinkas.TabIndex = 37;
+            braizimolinkas.TabStop = true;
+            braizimolinkas.Text = "mat.lt Grafikų braižymas";
+            braizimolinkas.LinkClicked += braizimolinkas_LinkClicked;
+            // 
+            // formsPlot1
+            // 
+            formsPlot1.Location = new Point(493, 172);
+            formsPlot1.Margin = new Padding(4, 3, 4, 3);
+            formsPlot1.Name = "formsPlot1";
+            formsPlot1.Size = new Size(282, 204);
+            formsPlot1.TabIndex = 38;
+            formsPlot1.Visible = false;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 491);
+            Controls.Add(formsPlot1);
             Controls.Add(interpolgroup);
             Controls.Add(lygtis2);
+            Controls.Add(Y_text);
+            Controls.Add(X_cord);
+            Controls.Add(X_text);
+            Controls.Add(braizimolinkas);
+            Controls.Add(accuracy);
+            Controls.Add(epsilon);
             Controls.Add(Max_text);
             Controls.Add(Min_text);
             Controls.Add(min);
@@ -489,10 +547,7 @@
             Controls.Add(flowLayoutPanel1);
             Controls.Add(Goal);
             Controls.Add(Method);
-            Controls.Add(Y_text);
-            Controls.Add(X_text);
             Controls.Add(y_cord);
-            Controls.Add(X_cord);
             MaximizeBox = false;
             Name = "Form1";
             Text = "Form1";
@@ -543,5 +598,9 @@
         private TextBox interpol_ix4;
         private TextBox interpol_4;
         private GroupBox interpolgroup;
+        private TextBox epsilon;
+        private TextBox accuracy;
+        private LinkLabel braizimolinkas;
+        private ScottPlot.FormsPlot formsPlot1;
     }
 }
